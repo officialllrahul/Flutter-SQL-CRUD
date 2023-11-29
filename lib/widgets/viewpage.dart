@@ -1,5 +1,8 @@
 
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'db_helper.dart';
 
 class ViewPage extends StatefulWidget {
@@ -12,6 +15,27 @@ class ViewPage extends StatefulWidget {
 class _ViewPageState extends State<ViewPage> {
   List<Map<String, dynamic>> _viewDataList = [];
   bool _isLoading = true;
+  File? _image;
+  final ImagePicker _picker = ImagePicker();
+  Future getImageGallery() async {
+    final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
+
+    if (pickedFile != null) {
+      setState(() {
+        _image = File(pickedFile.path);
+      });
+    }
+  }
+
+  Future getImageCamera() async {
+    final pickedFile = await _picker.pickImage(source: ImageSource.camera);
+
+    if (pickedFile != null) {
+      setState(() {
+        _image = File(pickedFile.path);
+      });
+    }
+  }
 
   void _refreshJournals() async {
     final data = await DatabaseHelper.instance.queryDatabase();
@@ -34,7 +58,6 @@ class _ViewPageState extends State<ViewPage> {
   void _showForm(int? id) async {
     if (id != null) {
       final existingJournal = _viewDataList.firstWhere((element) => element['id'] == id);
-
       updateNameController.text = existingJournal['name'];
       updateEmailController.text = existingJournal['email'];
       updateContactController.text = existingJournal['contact'];
@@ -55,6 +78,19 @@ class _ViewPageState extends State<ViewPage> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
+            Container(
+              margin: const EdgeInsets.all(20),
+              height: 200,
+              width: 200,
+              decoration: BoxDecoration(
+                border: Border.all(
+                  color: Colors.black,
+                ),
+              ),
+              child: _image != null
+                  ? Image.file(_image!.absolute)
+                  : const Center(child: Icon(Icons.image)),
+            ),
             TextField(
               controller: updateNameController,
               decoration: const InputDecoration(hintText: 'Name'),
@@ -96,6 +132,7 @@ class _ViewPageState extends State<ViewPage> {
         DatabaseHelper.columnName: updateNameController.text,
         DatabaseHelper.columnEmail: updateEmailController.text,
         DatabaseHelper.columnContact: updateContactController.text,
+
       },
     );
     _refreshJournals(); // Refresh the list after updating
@@ -113,6 +150,7 @@ class _ViewPageState extends State<ViewPage> {
         itemCount: _viewDataList.length,
         itemBuilder: (context, index) {
           final id = _viewDataList[index]['id'].toString();
+          final imagePath = _viewDataList[index]['image_path'] as String?;
           final name = _viewDataList[index]['name'] as String?;
           final email = _viewDataList[index]['email'] as String?;
 
@@ -121,7 +159,9 @@ class _ViewPageState extends State<ViewPage> {
             child: ListTile(
               leading: CircleAvatar(
                 radius: 17,
-                child: Text(id ?? 'no id'),
+                child: imagePath != null
+                    ? Image.file(File(imagePath))
+                    : const Icon(Icons.image), // Placeholder if imagePath is null
               ),
               title: Text(name ?? 'No Name'),
               subtitle: Text(email ?? 'No Email'),
@@ -138,8 +178,6 @@ class _ViewPageState extends State<ViewPage> {
                     IconButton(
                       icon: const Icon(Icons.delete),
                       onPressed: () {
-                        // Implement delete functionality
-                        // Call _deleteItem with the current id
                         _deleteItem(int.parse(id));
                       },
                     ),
@@ -150,6 +188,7 @@ class _ViewPageState extends State<ViewPage> {
           );
         },
       ),
+
     );
   }
 

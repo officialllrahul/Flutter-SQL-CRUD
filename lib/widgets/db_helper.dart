@@ -12,9 +12,11 @@ class DatabaseHelper {
   static const columnName = "name";
   static const columnEmail = "email";
   static const columnContact = "contact";
+  static const String columnImagePath = 'image_path';
 
   // constructor
   static final DatabaseHelper instance = DatabaseHelper();
+
 
   // databases initialize
   static Database? _database;
@@ -45,7 +47,8 @@ class DatabaseHelper {
       $columnId INTEGER PRIMARY KEY AUTOINCREMENT,
       $columnName TEXT NOT NULL,
       $columnEmail TEXT NOT NULL,
-      $columnContact TEXT NOT NULL
+      $columnContact TEXT NOT NULL,
+      $columnImagePath TEXT NOT NULL
       )
       ''');
 
