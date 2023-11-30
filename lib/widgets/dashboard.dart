@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sqlite_crud_flutter/widgets/viewpage.dart';
-
 import 'Insert.dart';
-import 'db_helper.dart';
 
 class DashBoard extends StatefulWidget {
   const DashBoard({super.key});
@@ -23,15 +21,15 @@ class _DashBoardState extends State<DashBoard> {
           children: [
             ElevatedButton(
                 onPressed: () {
-                  Navigator.push(context, MaterialPageRoute(builder: (context) => InsertPage(),));
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => const InsertPage(),));
                 },
-                child: Text("Insert")),
+                child: const Text("Insert")),
 
             ElevatedButton(
                 onPressed: () async{
-                  Navigator.push(context, MaterialPageRoute(builder: (context) => ViewPage(),));
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => const ViewPage(),));
                 },
-                child: Text("ViewPage Update and Delete")),
+                child: const Text("ViewPage Update and Delete")),
 
           ],
         ),
